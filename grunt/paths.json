@@ -1,6 +1,7 @@
 {
   "source": [
-    "app.js",
+    "contacts",
+    "index.js",
     "lib/**/*.js"
   ],
   "tests": [

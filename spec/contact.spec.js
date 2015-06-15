@@ -11,9 +11,9 @@ describe('the contacts object', function() {
           first: 'Charlton',
           last: 'Wilbur'
         }
-      }, function(err, c) {
-        expect(c.name.first).toBe('Charlton');
-        expect(c.name.last).toBe('Wilbur');
+      }, function(err, contact) {
+        expect(contact.name.first).toBe('Charlton');
+        expect(contact.name.last).toBe('Wilbur');
         done();
       });
     });

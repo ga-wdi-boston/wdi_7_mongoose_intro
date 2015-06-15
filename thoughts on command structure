@@ -1,0 +1,19 @@
+contacts init
+
+contacts add --first-name Joe --last-name Recruiter
+
+contacts list
+
+contacts set --find contact? --phone-number 617-555-1212
+
+contacts record --find contact? --date --content
+
+contacts delete
+
+
+
+
+
+Questions
+
+* how much information do we need to add a contact?

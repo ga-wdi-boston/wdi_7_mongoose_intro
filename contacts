@@ -3,6 +3,7 @@
 var util = require('util');
 var program = require('commander');
 var Contact = require('./lib/contacts.js');
+var mongoose = require('mongoose');
 
 program.version('0.1.0');
 
@@ -10,11 +11,28 @@ program
   .command('init')
   .description('initialize the database')
   .action(function() {
+      Contact.collection.remove({}, {multi: true});
+
+      //db.dropDatabase(function() {
+      //  console.log("dropped (callback)"); // never calls
+      //});
+      //console.log("dropped"); // prints "dropped"
+    }).on('--help', function() {
+    console.log('Example:');
+    console.log();
+    console.log('  $ contacts init');
+  });
+
+program
+  .command('list')
+  .description('list all contacts')
+  .action(function(){
+    Contact.ensureKeys();
 
   }).on('--help', function() {
     console.log('Example:');
     console.log();
-    console.log('  $ contacts init');
+    console.log('  $ contacts list');
   });
 
 program
@@ -24,14 +42,12 @@ program
   .option('--last-name [name]', 'contact\'s last name')
   .action(function() {
 
-    var c = Contact.create({
+    Contact.create({
       name: {
         first: this.firstName,
         last: this.lastName
       }
     });
-
-    c.save();
 
   }).on('--help', function() {
     console.log('Example:');
@@ -39,13 +55,59 @@ program
     console.log('  $ contacts add --first-name Charlton --last-name Wilbur');
   });
 
-var testData = ['node',
-  '/Users/cwilbur/Development/wdi_7_mongoose_intro/contacts',
-  'add',
-  '--first-name',
-  'Charlton',
-  '--last-name',
-  'Wilbur'
-];
+
+// now, database stuff
+
+  var mongoURI = 'mongodb://localhost/contacts';
+
+// if the connection actually connects
+mongoose.connection.on('connected', function () {
+  console.log('Mongoose default connection to DB :' + mongoURI + ' succeeded');
+});
+
+// If the connection throws an error
+mongoose.connection.on("error", function(err) {
+  console.error('Failed to connect to DB ' + mongoURI + ' on startup ', err);
+});
+
+// When the connection is disconnected
+mongoose.connection.on('disconnected', function () {
+  console.log('Mongoose default connection to DB :' + mongoURI + ' disconnected');
+});
+
+var gracefulExit = function() {
+  mongoose.connection.close(function () {
+    console.log('Mongoose default connection with DB :' + mongoURI + ' is disconnected through app termination');
+    process.exit(0);
+  });
+}
+
+// If the Node process ends, close the Mongoose connection
+process.on('SIGINT', gracefulExit).on('SIGTERM', gracefulExit);
+
+try {
+  mongoose.connect(mongoURI);
+  console.log("Trying to connect to DB " + mongoURI);
+} catch (err) {
+  console.log("Sever initialization failed " , err.message);
+}
 
 program.parse(process.argv);
+mongoose.disconnect();
+
+
+// var testInit = ['node',
+//   '/Users/cwilbur/Development/wdi_7_mongoose_intro/contacts',
+//   'init'];
+// var testAdd = ['node',
+//   '/Users/cwilbur/Development/wdi_7_mongoose_intro/contacts',
+//   'add',
+//   '--first-name',
+//   'Charlton',
+//   '--last-name',
+//   'Wilbur'
+// ];
+//
+// program.parse(testInit);
+
+
